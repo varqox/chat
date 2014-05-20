@@ -21,7 +21,7 @@ if(isset($_POST['message']))
 		deb("command received: ".$msg->text." command: ".$command.strlen($msg->text),$D_Debug);
 		if($command=='clear')
 		{
-			deb("cleaning besouse of command",$D_Info);
+			deb("cleaning becouse of command",$D_Info);
 			$tmp=fopen("history.txt","w");
 			fclose($tmp);
 		}
@@ -67,13 +67,16 @@ $data=json_decode(file_get_contents("history.txt"));
 
 $result=array();
 $result['chat']=array();
+//deb('data size: '.$data->{'size'});
 if(!isset($data->{'chat'}))
 {
-	echo '{"chat":[],"count":0}';
+	echo '{"chat":[],"count":0,"clear":1}';
+	deb('sanding empty info');
 	exit;
 }
 if ($data->{'size'}==0)
 {
+	deb('sanding clear info');
 	$result['clear']=1;
 }
 for($i=$_GET['from_each']; $i<$data->{'size'}; ++$i)

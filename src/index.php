@@ -149,7 +149,7 @@
 			var scrollToBottom=(chatbox.scrollHeight-chatbox.clientHeight==chatbox.scrollTop);
 			// $('#h').append(' -> '+scrollToBottom);
 			if(NM.clear)
-				$('.chatbox')="";
+				$('.chatbox').empty();
 			if(NM.count)
 				playBeep();
 			for(i=0; i<NM.count; ++i)

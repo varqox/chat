@@ -1,5 +1,5 @@
 <?php
-$debuglvl=5;
+$debuglvl=4;
 $D_Debug_Verbose=5;
 $D_Debug=4;
 $D_Info=3;
@@ -9,7 +9,8 @@ $D_None=0;
 
 function deb($co,$lvl=5)
 {
-	//if($dubuglvl>=$lvl)
+	global $debuglvl;
+	if($debuglvl>=$lvl)
 	{
 		$handle=fopen("debug.txt","a");
 		fwrite($handle, $lvl);
