@@ -3,26 +3,27 @@
 // if(isset($_GET['time']))
 // 	$_POST['time']=$_GET['time'];
 // file_put_contents("xxx.log", print_r($_POST, true));
-header('Content-type: application/text');
+// header('Content-type: application/text');
 
-include("debug.php");
+require_once "debug.php";
 
 if(isset($_POST['message']))
 {
-	$msg=$_POST['message'];
-	if ($msg[0]=='/')//user command catch
+	$msg=json_decode($_POST['message']);
+	deb('message received: '.$_POST['message'].' text: '.$msg->text);
+	if ($msg->text[0]=='/')//user command catch
 	{
-		deb("command received: "+$msg,D_Debug);
 		$end_of_first_word=1;
-		for (;$end_of_first_word<$msg.lenght&&$msg[$end_of_first_word]!=' ';$end_of_first_word++)
+		for (;$end_of_first_word<strlen($msg->text)&&$msg->text[$end_of_first_word]!=' ';$end_of_first_word++)
 			;
-		$cammand=substr(msg, 1,$end_of_first_word-1);
-		$parameter=substr(msg,$end_of_first_word);
+		$command=substr($msg->text, 1,$end_of_first_word-1);
+		$parameter=substr($msg->text,$end_of_first_word);
+		deb("command received: ".$msg->text." command: ".$command.strlen($msg->text),$D_Debug);
 		if($command=='clear')
 		{
-			deb("cleaning besouse of command",D_Info);
+			deb("cleaning besouse of command",$D_Info);
 			$tmp=fopen("history.txt","w");
-			fclose(tmp);
+			fclose($tmp);
 		}
 		exit;
 	}
