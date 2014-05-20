@@ -7,6 +7,21 @@ header('Content-type: application/text');
 
 if(isset($_POST['message']))
 {
+	$msg=$_POST['message'];
+	if ($msg[0]=='/')//user command catch
+	{
+		$end_of_first_word=1;
+		for (;$end_of_first_word<$msg.lenght&&$msg[$end_of_first_word]!=' ';$end_of_first_word++)
+			;
+		$cammand=substr(msg, 1,$end_of_first_word-1);
+		$parameter=substr(msg,$end_of_first_word);
+		if($command=='clear')
+		{
+			$tmp=fopen("history.txt","w");
+			fclose(tmp);
+		}
+		exit;
+	}
 	$data=json_decode(file_get_contents("history.txt"));
 	$data->{'chat'}[]=json_decode($_POST['message']);
 	++$data->{'size'};
@@ -52,7 +67,10 @@ if(!isset($data->{'chat'}))
 	echo '{"chat":[],"count":0}';
 	exit;
 }
-
+if ($data->{'size'}==0)
+{
+	$result['clear']=1;
+}
 for($i=$_GET['from_each']; $i<$data->{'size'}; ++$i)
 	$result['chat'][]=$data->{'chat'}[$i];
 

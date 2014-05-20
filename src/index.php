@@ -148,6 +148,8 @@
 			// $('#h').append(chatbox.scrollHeight+' '+chatbox.clientHeight+' '+chatbox.scrollTop);
 			var scrollToBottom=(chatbox.scrollHeight-chatbox.clientHeight==chatbox.scrollTop);
 			// $('#h').append(' -> '+scrollToBottom);
+			if(NM.clear)
+				$('.chatbox')="";
 			if(NM.count)
 				playBeep();
 			for(i=0; i<NM.count; ++i)
