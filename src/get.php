@@ -5,11 +5,14 @@
 // file_put_contents("xxx.log", print_r($_POST, true));
 header('Content-type: application/text');
 
+include("debug.php");
+
 if(isset($_POST['message']))
 {
 	$msg=$_POST['message'];
 	if ($msg[0]=='/')//user command catch
 	{
+		deb("command received: "+$msg,D_Debug);
 		$end_of_first_word=1;
 		for (;$end_of_first_word<$msg.lenght&&$msg[$end_of_first_word]!=' ';$end_of_first_word++)
 			;
@@ -17,6 +20,7 @@ if(isset($_POST['message']))
 		$parameter=substr(msg,$end_of_first_word);
 		if($command=='clear')
 		{
+			deb("cleaning besouse of command",D_Info);
 			$tmp=fopen("history.txt","w");
 			fclose(tmp);
 		}
