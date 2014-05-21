@@ -276,12 +276,12 @@
 				else if(strcmp(text, i+1, "ok]"))
 				{
 					i+=3;
-					result += '<p style="font-size: 30px;background:green;width:70px">OK</p>';
+					result += '<div style="font-size: 30px;background:green;width:70px">OK</div>';
 				}
 				else if(strcmp(text, i+1, "fuck]"))
 				{
 					i+=5;
-					result += '<p style="font-size: 30px;background:red;width:70px">Fuck</p>';
+					result += '<div style="font-size: 30px;background:red;width:70px">Fuck</div>';
 				}
 				else
 					result += '[';
