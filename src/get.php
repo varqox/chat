@@ -11,6 +11,10 @@ if(isset($_POST['message']))
 {
 	$msg=json_decode($_POST['message']);
 	deb('message received: '.$_POST['message'].' text: '.$msg->text);
+	if ($msg->user=="SYSTEM")
+	{
+		exit;	//TODO - resturn message: show 'Fuck you'
+	}
 	if ($msg->text[0]=='/')//user command catch
 	{
 		$end_of_first_word=1;
@@ -22,8 +26,14 @@ if(isset($_POST['message']))
 		if($command=='clear')
 		{
 			deb("cleaning becouse of command",$D_Info);
+			$msg_to_hist->user='SYSTEM';
+			$msg_to_hist->date=$msg->date;
+			$msg_to_hist->text="<div class=\"system_msg\">user: $msg->user cleared the chat</div>";
+			$data->{'chat'}[]=$msg_to_hist;
+			$data->{'size'}=1;
 			$tmp=fopen("history.txt","w");
 			fclose($tmp);
+			file_put_contents("history.txt", json_encode($data));
 		}
 		exit;
 	}
@@ -74,13 +84,14 @@ if(!isset($data->{'chat'}))
 	deb('sanding empty info');
 	exit;
 }
-if ($data->{'size'}==0)
-{
-	deb('sanding clear info');
-	$result['clear']=1;
-}
 for($i=$_GET['from_each']; $i<$data->{'size'}; ++$i)
 	$result['chat'][]=$data->{'chat'}[$i];
+if($_GET['from_each']>$data->{'size'})
+{
+	$result['clear']=1;
+	for($i=0; $i<$data->{'size'}; ++$i)
+	$result['chat'][]=$data->{'chat'}[$i];
+}
 
 // echo "<pre>";
 // print_r($result);

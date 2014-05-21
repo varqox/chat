@@ -91,6 +91,10 @@
 		padding: 6px 10px;
 		border-radius: 3px;
 	}
+	.system_msg
+	{
+		font-size: 20px;
+	}
 	</style>
 	<script type="text/javascript">
 
@@ -144,16 +148,22 @@
 		{
 			$('#conn_error').css("display", "none");
 			var NM=JSON.parse(responseText);
+			if(NM.clear)
+			{
+				$('.chatbox').empty();
+				from_each=0;
+			}
 			var chatbox=document.getElementsByClassName('chatbox')[0];
 			// $('#h').append(chatbox.scrollHeight+' '+chatbox.clientHeight+' '+chatbox.scrollTop);
 			var scrollToBottom=(chatbox.scrollHeight-chatbox.clientHeight==chatbox.scrollTop);
 			// $('#h').append(' -> '+scrollToBottom);
-			if(NM.clear)
-				$('.chatbox').empty();
 			if(NM.count)
 				playBeep();
 			for(i=0; i<NM.count; ++i)
+				if (NM.chat[i].user!="SYSTEM")
 				$('.chatbox').append("<div id='"+from_each++ +"'><span class=\"user\">"+NM.chat[i].user+'</span><span class="time">'+NM.chat[i].date+'</span><br><pre>'+parse(NM.chat[i].text)+"</pre></div>");
+				else
+				$('.chatbox').append("<div id='"+from_each++ +"'><span class=\"user\">"+NM.chat[i].user+'</span><span class="time">'+NM.chat[i].date+'</span><br><pre>'+NM.chat[i].text+"</pre></div>");
 			// if scroll was at bottom we move it to bottom back
 			if(scrollToBottom)
 				chatbox.scrollTop=chatbox.scrollHeight-chatbox.clientHeight;
