@@ -91,10 +91,6 @@
 		padding: 6px 10px;
 		border-radius: 3px;
 	}
-	.system_msg
-	{
-		font-size: 20px;
-	}
 	</style>
 	<script type="text/javascript">
 
@@ -133,12 +129,12 @@
 	}
 
 	var from_each = 0, user, currentScroll, refresh_busy=false;
-
 	function refresh()
 	{
 		// var success,
 		// d=Math.floor((new Date()).getTime()/1000);
 		// if(d==old_time) return;
+
 		if(refresh_busy)
 			return;
 		else
@@ -146,12 +142,13 @@
 		$('#h').text((new Date()).toString());
 		$.get("get.php?from_each="+from_each).success(function(responseText, textStatus, XMLHttpRequest)
 		{
-			$('#conn_error').css("display", "none");
-			var NM=JSON.parse(responseText);
-			if(NM.clear)
-			{
-				$('.chatbox').empty();
-				from_each=0;
+			var NM;
+			try {NM=JSON.parse(responseText);}
+			catch (e) {
+				console.error("Parsing error:", e);
+				$('#conn_error').css("display", "block");
+				refresh_busy=false;
+				return;
 			}
 			var chatbox=document.getElementsByClassName('chatbox')[0];
 			// $('#h').append(chatbox.scrollHeight+' '+chatbox.clientHeight+' '+chatbox.scrollTop);
@@ -160,15 +157,13 @@
 			if(NM.count)
 				playBeep();
 			for(i=0; i<NM.count; ++i)
-				if (NM.chat[i].user!="SYSTEM")
 				$('.chatbox').append("<div id='"+from_each++ +"'><span class=\"user\">"+NM.chat[i].user+'</span><span class="time">'+NM.chat[i].date+'</span><br><pre>'+parse(NM.chat[i].text)+"</pre></div>");
-				else
-				$('.chatbox').append("<div id='"+from_each++ +"'><span class=\"user\">"+NM.chat[i].user+'</span><span class="time">'+NM.chat[i].date+'</span><br><pre>'+NM.chat[i].text+"</pre></div>");
 			// if scroll was at bottom we move it to bottom back
 			if(scrollToBottom)
 				chatbox.scrollTop=chatbox.scrollHeight-chatbox.clientHeight;
 			refresh_busy=false;
-		}).error(function()
+			$('#conn_error').css("display", "none");
+		}).error(function ()
 		{
 			$('#conn_error').css("display", "block");
 			refresh_busy=false;
@@ -281,12 +276,12 @@
 				else if(strcmp(text, i+1, "ok]"))
 				{
 					i+=3;
-					result += '<p style="font-size: 30px;background:green;width:70px">OK</p>';
+					result += '<div style="font-size: 30px;background:green;width:70px">OK</div>';
 				}
 				else if(strcmp(text, i+1, "fuck]"))
 				{
 					i+=5;
-					result += '<p style="font-size: 30px;background:red;width:70px">Fuck</p>';
+					result += '<div style="font-size: 30px;background:red;width:70px">Fuck</div>';
 				}
 				else
 					result += '[';
