@@ -290,7 +290,7 @@
 </head>
 <body onload="startup()"style="font-family:'DejaVu Sans'">
 <p id='h'></p>
-<div id='conn_error' style="display:none;float:left;width:200px;height:40px;background:red;font-size:30px;border-radius:5px;"><center>Fuck you</center></div>
+<div id='conn_error' style="display:none;width:400px;height:80px;background:rgba(255,0,0,0.8);font-size:55px;border-radius:5px;text-align:center;position:fixed;top: 50%;left: 50%;margin-top: -40px;margin-left: -200px;"><center style="padding-top: 5px;height:80px;">Fuck you</center></div>
 <div class="chat">
 <span id="chatbeep"></span>
 <div class="chatbox">
