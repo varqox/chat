@@ -154,12 +154,20 @@
 			// $('#h').append(chatbox.scrollHeight+' '+chatbox.clientHeight+' '+chatbox.scrollTop);
 			var scrollToBottom=(chatbox.scrollHeight-chatbox.clientHeight==chatbox.scrollTop);
 			// $('#h').append(' -> '+scrollToBottom);
+			if (NM.clear)
+			{
+				$('.chatbox').empty();
+				from_each=0;
+			}
 			if(NM.count)
 				playBeep();
 			for(i=0; i<NM.count; ++i)
 			{
-				$('.chatbox').append("<div id='"+from_each++ +" style=\"display:none\"'><span class=\"user\">"+NM.chat[i].user+'</span><span class="time">'+NM.chat[i].date+'</span><br><pre>'+parse(NM.chat[i].text)+"</pre></div>");
-				$('#'+(from_each-1)).fadeIn("slow");
+				if (NM.chat[i].user!="SYSTEM")
+				$('.chatbox').append("<div id='"+from_each++ +"' style='display:none'><span class=\"user\">"+NM.chat[i].user+'</span><span class="time">'+NM.chat[i].date+'</span><br><pre>'+parse(NM.chat[i].text)+"</pre></div>");
+				else
+				$('.chatbox').append("<div id='"+from_each++ +"' style='display:none'><span class=\"user\">"+NM.chat[i].user+'</span><span class="time">'+NM.chat[i].date+'</span><br><pre>'+NM.chat[i].text+"</pre></div>");
+				$(('#'+(from_each-1))).fadeIn(1000);
 			}
 			// if scroll was at bottom we move it to bottom back
 			if(scrollToBottom)
