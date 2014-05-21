@@ -212,7 +212,7 @@
 		{
 			var name=prompt("Please enter your name", "guest");
 			user=name;
-			setCookie('chat_name', user, 60*60);
+			setCookie('chat_name', user, 60*60*4);
 		}
 		else
 			user=tmp;
@@ -275,6 +275,16 @@
 				{
 					i+=5;
 					result += '<p style="font-size: 30px;background:red;width:70px">Fuck</p>';
+				}
+				else if(strcmp(text, i+1, "a]"))
+				{
+					i += 2;
+					result += '<a href="';
+					var x = String();
+					while(++i < text.length && !(text[i] == '[' && strcmp(text, i+1, "/a]")))
+						x += safe_char(text[i]);
+					i += 3;
+					result += x + '">'+x+'</a>';
 				}
 				else
 					result += '[';
