@@ -5,18 +5,9 @@
 // file_put_contents("xxx.log", print_r($_POST, true));
 header('Content-type: application/text');
 
-$max_message_lenght=10;//20*1024;
-
 if(isset($_POST['message']))
 {
 	$data=json_decode(file_get_contents("history.txt"));
-	$msg=json_decode($_POST['message']);
-	if(strlen($_POST['message'])>$max_message_lenght)
-	{
-		$ilod=strlen($_POST['message'])-$max_message_lenght;
-		$msg->text=substr($msg->text,0,strlen($msg->text)-$ilod);
-		$msg->text.='...';
-	}
 	$data->{'chat'}[]=json_decode($_POST['message']);
 	++$data->{'size'};
 	if($data == '')
