@@ -129,12 +129,12 @@
 	}
 
 	var from_each = 0, user, currentScroll, refresh_busy=false;
-
 	function refresh()
 	{
 		// var success,
 		// d=Math.floor((new Date()).getTime()/1000);
 		// if(d==old_time) return;
+
 		if(refresh_busy)
 			return;
 		else
@@ -142,8 +142,14 @@
 		$('#h').text((new Date()).toString());
 		$.get("get.php?from_each="+from_each).success(function(responseText, textStatus, XMLHttpRequest)
 		{
-			$('#conn_error').css("display", "none");
-			var NM=JSON.parse(responseText);
+			var NM;
+			try {NM=JSON.parse(responseText);}
+			catch (e) {
+				console.error("Parsing error:", e);
+				$('#conn_error').css("display", "block");
+				refresh_busy=false;
+				return;
+			}
 			var chatbox=document.getElementsByClassName('chatbox')[0];
 			// $('#h').append(chatbox.scrollHeight+' '+chatbox.clientHeight+' '+chatbox.scrollTop);
 			var scrollToBottom=(chatbox.scrollHeight-chatbox.clientHeight==chatbox.scrollTop);
@@ -156,7 +162,8 @@
 			if(scrollToBottom)
 				chatbox.scrollTop=chatbox.scrollHeight-chatbox.clientHeight;
 			refresh_busy=false;
-		}).error(function()
+			$('#conn_error').css("display", "none");
+		}).error(function ()
 		{
 			$('#conn_error').css("display", "block");
 			refresh_busy=false;
@@ -269,12 +276,12 @@
 				else if(strcmp(text, i+1, "ok]"))
 				{
 					i+=3;
-					result += '<p style="font-size: 30px;background:green;width:70px">OK</p>';
+					result += '<div style="font-size: 30px;background:green;width:70px">OK</div>';
 				}
 				else if(strcmp(text, i+1, "fuck]"))
 				{
 					i+=5;
-					result += '<p style="font-size: 30px;background:red;width:70px">Fuck</p>';
+					result += '<div style="font-size: 30px;background:red;width:70px">Fuck</div>';
 				}
 				else if(strcmp(text, i+1, "a]"))
 				{
@@ -298,7 +305,7 @@
 </head>
 <body onload="startup()"style="font-family:'DejaVu Sans'">
 <p id='h'></p>
-<div id='conn_error' style="display:none;float:left;width:200px;height:40px;background:red;font-size:30px;border-radius:5px;"><center>Fuck you</center></div>
+<div id='conn_error' style="display:none;width:400px;height:80px;background:rgba(255,0,0,0.8);font-size:55px;border-radius:5px;text-align:center;position:fixed;top: 50%;left: 50%;margin-top: -40px;margin-left: -200px;"><center style="padding-top: 5px;height:80px;">Fuck you</center></div>
 <div class="chat">
 <span id="chatbeep"></span>
 <div class="chatbox">
