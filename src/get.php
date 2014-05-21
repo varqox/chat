@@ -5,6 +5,8 @@
 // file_put_contents("xxx.log", print_r($_POST, true));
 // header('Content-type: application/text');
 
+$size_after_cleaning=100;
+
 require_once "debug.php";
 
 if(isset($_POST['message']))
@@ -22,18 +24,38 @@ if(isset($_POST['message']))
 			;
 		$command=substr($msg->text, 1,$end_of_first_word-1);
 		$parameter=substr($msg->text,$end_of_first_word);
-		deb("command received: ".$msg->text." command: ".$command.strlen($msg->text),$D_Debug);
-		if($command=='clear')
+		deb("command received: ".$msg->text." command: ",$D_Debug);//.$command.strlen($msg->text)
+		if($command=='clean')
 		{
-			deb("cleaning becouse of command",$D_Info);
+			//deb("Thinking about cleaning",$D_Info);
 			$msg_to_hist->user='SYSTEM';
 			$msg_to_hist->date=$msg->date;
-			$msg_to_hist->text="<div class=\"system_msg\">user: $msg->user cleared the chat</div>";
-			$data->{'chat'}[]=$msg_to_hist;
-			$data->{'size'}=1;
-			$tmp=fopen("history.txt","w");
-			fclose($tmp);
-			file_put_contents("history.txt", json_encode($data));
+			$data_old=json_decode(file_get_contents("history.txt"));
+			if ($data_old->{'size'}>$size_after_cleaning)
+			{
+				deb("cleaning becouse of command",$D_Info);
+				$msg_to_hist->text="<div class=\"system_msg\">user: $msg->user cleaned the chat</div>";
+				for ($i=$data_old->{'size'}-$size_after_cleaning;$i<$data_old->{'size'};$i++)
+				{
+					$data_new->{'chat'}[]=$data_old->{'chat'}[$i];
+				}
+				$data_new->{'chat'}[]=$msg_to_hist;
+				$data_new->{'size'}=$size_after_cleaning+1;
+				$tmp=fopen("history.txt","w");
+				fclose($tmp);
+				file_put_contents("history.txt", json_encode($data_new));
+			}
+			else
+			{
+				deb("cleaning insued, but nothing to clean",$D_Info);
+				$msg_to_hist->text="user: $msg->user tried to clean the chat, but there are not anought messages";
+				$data_new=$data_old;
+				$data_new->{'chat'}[]=$msg_to_hist;
+				$data_new->{'size'}++;
+				$tmp=fopen("history.txt","w");
+				fclose($tmp);
+				file_put_contents("history.txt", json_encode($data_new));
+			}
 		}
 		exit;
 	}
