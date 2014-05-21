@@ -9,7 +9,7 @@ $size_after_cleaning=100;
 
 require_once "debug.php";
 
-$max_message_lenght=10;//20*1024;
+$max_message_lenght=20*1024;
 
 if(isset($_POST['message']))
 {
@@ -63,13 +63,15 @@ if(isset($_POST['message']))
 	}
 	$data=json_decode(file_get_contents("history.txt"));
 	$msg=json_decode($_POST['message']);
+
 	if(strlen($_POST['message'])>$max_message_lenght)
 	{
 		$ilod=strlen($_POST['message'])-$max_message_lenght;
+		deb("zadlugie dane obcinam z:".strlen($_POST['message'])." o:".$ilod);
 		$msg->text=substr($msg->text,0,strlen($msg->text)-$ilod);
 		$msg->text.='...';
 	}
-	$data->{'chat'}[]=json_decode($_POST['message']);
+	$data->{'chat'}[]=$msg;
 	++$data->{'size'};
 	if($data == '')
 	{
