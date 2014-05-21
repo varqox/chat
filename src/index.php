@@ -219,7 +219,7 @@
 		{
 			var name=prompt("Please enter your name", "guest");
 			user=name;
-			setCookie('chat_name', user, 60*60*4);
+			setCookie('chat_name', user, 60*60);
 		}
 		else
 			user=tmp;
