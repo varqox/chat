@@ -276,7 +276,7 @@
 				else if(strcmp(text, i+1, "ok]"))
 				{
 					i+=3;
-					result += '<div style="font-size: 30px;background:green;width:70px">OK</div>';
+					result += '<div style="font-size: 30px;background:#00BF00;width:70px">OK</div>';
 				}
 				else if(strcmp(text, i+1, "fuck]"))
 				{
