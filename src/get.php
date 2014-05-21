@@ -106,6 +106,7 @@ if(!isset($data->{'chat'}))
 	deb('sanding empty info');
 	exit;
 }
+
 for($i=$_GET['from_each']; $i<$data->{'size'}; ++$i)
 	$result['chat'][]=$data->{'chat'}[$i];
 if($_GET['from_each']>$data->{'size'})
