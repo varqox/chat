@@ -129,12 +129,12 @@
 	}
 
 	var from_each = 0, user, currentScroll, refresh_busy=false;
-
 	function refresh()
 	{
 		// var success,
 		// d=Math.floor((new Date()).getTime()/1000);
 		// if(d==old_time) return;
+
 		if(refresh_busy)
 			return;
 		else
@@ -142,8 +142,14 @@
 		$('#h').text((new Date()).toString());
 		$.get("get.php?from_each="+from_each).success(function(responseText, textStatus, XMLHttpRequest)
 		{
-			$('#conn_error').css("display", "none");
-			var NM=JSON.parse(responseText);
+			var NM;
+			try {NM=JSON.parse(responseText);}
+			catch (e) {
+				console.error("Parsing error:", e);
+				$('#conn_error').css("display", "block");
+				refresh_busy=false;
+				return;
+			}
 			var chatbox=document.getElementsByClassName('chatbox')[0];
 			// $('#h').append(chatbox.scrollHeight+' '+chatbox.clientHeight+' '+chatbox.scrollTop);
 			var scrollToBottom=(chatbox.scrollHeight-chatbox.clientHeight==chatbox.scrollTop);
@@ -156,7 +162,8 @@
 			if(scrollToBottom)
 				chatbox.scrollTop=chatbox.scrollHeight-chatbox.clientHeight;
 			refresh_busy=false;
-		}).error(function()
+			$('#conn_error').css("display", "none");
+		}).error(function ()
 		{
 			$('#conn_error').css("display", "block");
 			refresh_busy=false;
