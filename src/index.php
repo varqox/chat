@@ -157,7 +157,10 @@
 			if(NM.count)
 				playBeep();
 			for(i=0; i<NM.count; ++i)
-				$('.chatbox').append("<div id='"+from_each++ +"'><span class=\"user\">"+NM.chat[i].user+'</span><span class="time">'+NM.chat[i].date+'</span><br><pre>'+parse(NM.chat[i].text)+"</pre></div>");
+			{
+				$('.chatbox').append("<div id='"+from_each++ +" style=\"display:none\"'><span class=\"user\">"+NM.chat[i].user+'</span><span class="time">'+NM.chat[i].date+'</span><br><pre>'+parse(NM.chat[i].text)+"</pre></div>");
+				$('#'+(from_each-1)).fadeIn("slow");
+			}
 			// if scroll was at bottom we move it to bottom back
 			if(scrollToBottom)
 				chatbox.scrollTop=chatbox.scrollHeight-chatbox.clientHeight;
