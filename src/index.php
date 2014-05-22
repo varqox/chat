@@ -157,10 +157,11 @@
 			if (NM.clear)
 			{
 				$('.chatbox').empty();
+				playBeep('clean.wav');
 				from_each=0;
 			}
-			if(NM.count)
-				playBeep();
+			else if(NM.count)
+				playBeep('error.wav');
 			for(i=0; i<NM.count; ++i)
 			{
 				if (NM.chat[i].user!="SYSTEM")
@@ -230,7 +231,7 @@
 		{
 			var name=prompt("Please enter your name", "guest");
 			user=name;
-			setCookie('chat_name', user, 60*60);
+			setCookie('chat_name', user, 60*60*4);
 		}
 		else
 			user=tmp;
@@ -262,9 +263,9 @@
 		}
 		return c;
 	}
-	function playBeep()
+	function playBeep(sound)
 	{
-		document.getElementById('chatbeep').innerHTML='<audio autoplay="autoplay" src="error.wav" type="audio/wav"><embed src="error.wav" hidden="true" autostart="true" loop="false" /></audio>';
+		document.getElementById('chatbeep').innerHTML='<audio autoplay="autoplay" src="'+sound+'" type="audio/wav"><embed src="'+sound+'" hidden="true" autostart="true" loop="false" /></audio>';
 	}
 	function parse(text)
 	{
