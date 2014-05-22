@@ -173,6 +173,14 @@
 				$('.chatbox').append("<div id='"+from_each++ +"' style='display:none'><span class=\"user\">"+NM.chat[i].user+'</span><span class="time">'+NM.chat[i].date+'</span><br><pre>'+parse(NM.chat[i].text)+"</pre></div>");
 				else
 				$('.chatbox').append("<div id='"+from_each++ +"' style='display:none'><span class=\"user\">"+NM.chat[i].user+'</span><span class="time">'+NM.chat[i].date+'</span><br><pre>'+NM.chat[i].text+"</pre></div>");
+				console.log($(('#'+(from_each-1))+' > pre').height());
+				if($(('#'+(from_each-1))+' > pre').height()>15)
+				{
+					$(('#'+(from_each-1))).css('height','140px');
+					console.log('znalazlem');
+					//$(('#'+(from_each-1))+' > pre').append('<button action="alert(\'jej dziala\');" \>');
+				}
+				$(('#'+(from_each-1))).fadeIn(1000);
 				$(('#'+(from_each-1))).fadeIn(1000);
 			}
 			// if scroll was at bottom we move it to bottom back
