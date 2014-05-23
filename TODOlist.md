@@ -1,2 +1,0 @@
- - [ ] history limit
- - [ ] user management
