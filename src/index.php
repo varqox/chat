@@ -145,6 +145,10 @@
 	function show_more(i)
 	{
 		$('#'+i+' > pre').toggleClass("extended");
+		//if ($('#'+i+' > button').html=="show more")
+			$('#'+i+' > button').html("show less");
+		//else
+		//	$('#'+i+' > button').html("show more");
 	}
 	var from_each = 0, user, currentScroll, refresh_busy=false;
 	function refresh()
@@ -190,7 +194,7 @@
 				if($(('#'+(from_each-1))).height()>150)
 				{
 					$(('#'+(from_each-1))+' > pre').addClass('extended');
-					$(('#'+(from_each-1))).append('<button onclick="show_more('+(from_each-1)+');" style="margin-top: 3px">show more</button>');
+					$(('#'+(from_each-1))).append('<button onclick="show_more('+(from_each-1)+')" style="margin-top: 3px">show more</button>');
 				}
 				$(('#'+(from_each-1))).fadeIn(1000);
 			}
