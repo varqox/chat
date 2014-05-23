@@ -144,11 +144,11 @@
 	}
 	function show_more(i)
 	{
+		if ($('#'+i+' > pre').hasClass("extended"))
+			{$('#'+i+' > button').html("show less");}
+		else
+			{$('#'+i+' > button').html("show more");}
 		$('#'+i+' > pre').toggleClass("extended");
-		//if ($('#'+i+' > button').html=="show more")
-			$('#'+i+' > button').html("show less");
-		//else
-		//	$('#'+i+' > button').html("show more");
 	}
 	var from_each = 0, user, currentScroll, refresh_busy=false;
 	function refresh()
