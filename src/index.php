@@ -90,6 +90,7 @@
 		-webkit-border-radius: 4px;
 		-moz-border-radius: 4px;
 		border-radius: 4px;
+		position: relative;
 	}
 	.code
 	{
@@ -103,7 +104,7 @@
 		-moz-border-radius: 4px;
 		border-radius: 4px;
 	}
-	.extended{
+	.shortened{
 		height: 140px;
 	}
 	</style>
@@ -144,11 +145,11 @@
 	}
 	function show_more(i)
 	{
-		if ($('#'+i+' > pre').hasClass("extended"))
-			{$('#'+i+' > button').html("show less");}
+		if ($('#'+i+' > pre').hasClass("shortened"))
+			{$('#'+i+' > pre > button').html("show less");}
 		else
-			{$('#'+i+' > button').html("show more");}
-		$('#'+i+' > pre').toggleClass("extended");
+			{$('#'+i+' > pre > button').html("show more");}
+		$('#'+i+' > pre').toggleClass("shortened");
 	}
 	var from_each = 0, user, currentScroll, refresh_busy=false;
 	function refresh()
@@ -193,8 +194,8 @@
 				console.log($(('#'+(from_each-1))).height());
 				if($(('#'+(from_each-1))).height()>150)
 				{
-					$(('#'+(from_each-1))+' > pre').addClass('extended');
-					$(('#'+(from_each-1))).append('<button onclick="show_more('+(from_each-1)+')" style="margin-top: 3px">show more</button>');
+					$(('#'+(from_each-1))+' > pre').addClass('shortened');
+					$(('#'+(from_each-1))+' > pre').append('<button onclick="show_more('+(from_each-1)+')" style="margin-top: 3px;position:absolute;bottom:0px;right:0px">show more</button>');
 				}
 				$(('#'+(from_each-1))).fadeIn(1000);
 			}
