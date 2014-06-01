@@ -78,13 +78,19 @@
 		margin: 0;
 		font-family: inherit;
 		font-size: 15px;
-		padding: 2px;
+		padding: 2px 2px 0 0;
 		word-break: break-word;
 		white-space: pre-wrap; /* css-3 */
 		white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
 		white-space: -pre-wrap; /* Opera 4-6 */
 		white-space: -o-pre-wrap; /* Opera 7 */
 		word-wrap: break-word;
+		overflow: hidden;
+		border: 1px solid #ffffff;
+		-webkit-border-radius: 4px;
+		-moz-border-radius: 4px;
+		border-radius: 4px;
+		position: relative;
 	}
 	.code
 	{
@@ -94,7 +100,12 @@
 		line-height: 19px;
 		overflow: auto;
 		padding: 6px 10px;
-		border-radius: 3px;
+		-webkit-border-radius: 4px;
+		-moz-border-radius: 4px;
+		border-radius: 4px;
+	}
+	.shortened{
+		height: 140px;
 	}
 	</style>
 	<script type="text/javascript">
@@ -116,7 +127,7 @@
 	{
 		var name = cname + "=";
 		var ca = document.cookie.split(';');
-		for(var i=0; i<ca.length; i++)
+		for(i=0; i<ca.length; i++)
 		{
 			var c = ca[i].trim();
 			if(c.indexOf(name)==0)
@@ -132,7 +143,14 @@
 		var expires = "expires="+d.toGMTString();
 		document.cookie = cname + "=" + cvalue + "; " + expires + "; path=" + path;
 	}
-
+	function show_more(i)
+	{
+		if ($('#'+i+' > pre').hasClass("shortened"))
+			{$('#'+i+' > pre > button').html("show less");}
+		else
+			{$('#'+i+' > pre > button').html("show more");}
+		$('#'+i+' > pre').toggleClass("shortened");
+	}
 	var from_each = 0, user, currentScroll, refresh_busy=false;
 	function refresh()
 	{
@@ -173,6 +191,12 @@
 				$('.chatbox').append("<div id='"+from_each++ +"' style='display:none'><span class=\"user\">"+NM.chat[i].user+'</span><span class="time">'+NM.chat[i].date+'</span><br><pre>'+parse(NM.chat[i].text)+"</pre></div>");
 				else
 				$('.chatbox').append("<div id='"+from_each++ +"' style='display:none'><span class=\"user\">"+NM.chat[i].user+'</span><span class="time">'+NM.chat[i].date+'</span><br><pre>'+NM.chat[i].text+"</pre></div>");
+				console.log($(('#'+(from_each-1))).height());
+				if($(('#'+(from_each-1))).height()>150)
+				{
+					$(('#'+(from_each-1))+' > pre').addClass('shortened');
+					$(('#'+(from_each-1))+' > pre').append('<button onclick="show_more('+(from_each-1)+')" style="margin-top: 3px;position:absolute;bottom:0px;right:0px">show more</button>');
+				}
 				$(('#'+(from_each-1))).fadeIn(1000);
 			}
 			// if scroll was at bottom we move it to bottom back
