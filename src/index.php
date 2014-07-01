@@ -106,6 +106,9 @@
 	.extended{
 		height: 140px;
 	}
+	.emoticon{
+		height: 13px;
+	}
 	</style>
 	<script type="text/javascript">
 
@@ -190,7 +193,7 @@
 				$('.chatbox').append("<div id='"+from_each++ +"' style='display:none'><span class=\"user\">"+NM.chat[i].user+'</span><span class="time">'+NM.chat[i].date+'</span><br><pre>'+parse(NM.chat[i].text)+"</pre></div>");
 				else
 				$('.chatbox').append("<div id='"+from_each++ +"' style='display:none'><span class=\"user\">"+NM.chat[i].user+'</span><span class="time">'+NM.chat[i].date+'</span><br><pre>'+NM.chat[i].text+"</pre></div>");
-				console.log($(('#'+(from_each-1))).height());
+				//console.log($(('#'+(from_each-1))).height());
 				if($(('#'+(from_each-1))).height()>150)
 				{
 					$(('#'+(from_each-1))+' > pre').addClass('extended');
@@ -302,6 +305,16 @@
 		{
 			if(text[i] == '\\' && i+1<text.length)
 				result += text[++i];
+			else if(strcmp(text, i, ":-)"))
+			{
+				result+= '<img src="emoticons/smile.gif" alt=":-)" class="emoticon" />';
+				i+=2;
+			}
+			else if(strcmp(text, i, ":)"))
+			{
+				result+= '<img src="emoticons/smile.gif" alt=":)" class="emoticon" />';
+				i+=1;
+			}
 			else if(text[i] == '[')
 			{
 				if(strcmp(text, i+1, "code]"))
