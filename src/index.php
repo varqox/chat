@@ -48,32 +48,36 @@
 	}
 	.chatbox
 	{
-		padding-left: 10px;
-		border-bottom: 2px solid #aaaaaa;
-		margin: 0px 0 3px 0;
 		overflow-y: scroll;
 		height: 500px;
+		margin: 0px 0 3px 0;
+		border-bottom: 2px solid #aaaaaa;
+		padding-left: 10px;
 		/*width: 300px;*/
 	}
-	.chatbox div
+	.chatcontent
+	{
+
+	}
+	.chatcontent div
 	{
 		border: 1px solid #b3b3b3;
 		border-radius: 5px;
 		padding-left: 4px;
 		margin: 2px 5px 2px 0;
 	}
-	.chatbox .user
+	.chatcontent .user
 	{
 		font-weight: bold;
 		font-size: 17px;
 	}
-	.chatbox .time
+	.chatcontent .time
 	{
 		padding-left: 10px;
 		font-size: 12px;
 		font-style: italic;
 	}
-	.chatbox pre
+	.chatcontent pre
 	{
 		margin: 0;
 		font-family: inherit;
@@ -179,13 +183,13 @@
 				refresh_busy=false;
 				return;
 			}
-			var chatbox=document.getElementsByClassName('chatbox')[0];
-			// $('#h').append(chatbox.scrollHeight+' '+chatbox.clientHeight+' '+chatbox.scrollTop);
-			var scrollToBottom=(chatbox.scrollHeight-chatbox.clientHeight==chatbox.scrollTop);
+			var chatcontent=document.getElementsByClassName('chatcontent')[0];
+			// $('#h').append(chatcontent.scrollHeight+' '+chatcontent.clientHeight+' '+chatcontent.scrollTop);
+			var scrollToBottom=(chatcontent.scrollHeight-chatcontent.clientHeight==chatcontent.scrollTop);
 			// $('#h').append(' -> '+scrollToBottom);
 			if (NM.clear)
 			{
-				$('.chatbox').empty();
+				$('.chatcontent').empty();
 				playBeep('clean.wav');
 				first_msg=NM.begining;
 				from_each=first_msg;
@@ -195,9 +199,9 @@
 			for(i=0; i<NM.count; ++i)
 			{
 				if (NM.chat[i].user!="SYSTEM")
-				$('.chatbox').append("<div id='"+from_each++ +"' style='display:none'><span class=\"user\">"+NM.chat[i].user+'</span><span class="time">'+NM.chat[i].date+'</span><br><pre>'+parse(NM.chat[i].text)+"</pre></div>");
+				$('.chatcontent').append("<div id='"+from_each++ +"' style='display:none'><span class=\"user\">"+NM.chat[i].user+'</span><span class="time">'+NM.chat[i].date+'</span><br><pre>'+parse(NM.chat[i].text)+"</pre></div>");
 				else
-				$('.chatbox').append("<div id='"+from_each++ +"' style='display:none'><span class=\"user\">"+NM.chat[i].user+'</span><span class="time">'+NM.chat[i].date+'</span><br><pre>'+NM.chat[i].text+"</pre></div>");
+				$('.chatcontent').append("<div id='"+from_each++ +"' style='display:none'><span class=\"user\">"+NM.chat[i].user+'</span><span class="time">'+NM.chat[i].date+'</span><br><pre>'+NM.chat[i].text+"</pre></div>");
 				// console.log($(('#'+(from_each-1))).height());
 				if($(('#'+(from_each-1))).height()>150)
 				{
@@ -208,7 +212,7 @@
 			}
 			// if scroll was at bottom we move it to bottom back
 			if(scrollToBottom)
-				chatbox.scrollTop=chatbox.scrollHeight-chatbox.clientHeight;
+				chatcontent.scrollTop=chatcontent.scrollHeight-chatcontent.clientHeight;
 			refresh_busy=false;
 			$('#conn_error').css("display", "none");
 		}).error(function ()
@@ -357,6 +361,9 @@
 <div class="chat">
 <span id="chatbeep"></span>
 <div class="chatbox">
+...
+<div class="chatcontent">
+</div>
 </div>
 <div style="padding: 0 0 0 5px">
 <textarea id="addedText" onkeypress="controlArea(event)"></textarea>
