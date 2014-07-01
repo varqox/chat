@@ -109,7 +109,12 @@
 	}
 	</style>
 	<script type="text/javascript">
-
+	function Enum(){
+	    for( var i = 0; i < arguments.length; ++i ){
+	        this[arguments[i]] = i;
+	    }
+    return this;
+	}
 	function fill_to_width(text, size)
 	{
 		text=new String(text);
@@ -151,7 +156,8 @@
 			{$('#'+i+' > pre > button').html("show more");}
 		$('#'+i+' > pre').toggleClass("shortened");
 	}
-	var from_each = 0, user, currentScroll, refresh_busy=false;
+	var from_each = 0, first_msg=0 , user, currentScroll, refresh_busy=false;
+	 REQ_CODE = new Enum("GET_NEW","GET_OLD");
 	function refresh()
 	{
 		// var success,
@@ -162,7 +168,7 @@
 			return;
 		else
 			refresh_busy=true;
-		$.get("get.php?from_each="+from_each).success(function(responseText, textStatus, XMLHttpRequest)
+		$.get("get.php?what=0&from_each="+from_each).success(function(responseText, textStatus, XMLHttpRequest)
 		{
 			$('#h').text((new Date()).toString());
 			var NM;
@@ -181,7 +187,8 @@
 			{
 				$('.chatbox').empty();
 				playBeep('clean.wav');
-				from_each=0;
+				first_msg=NM.begining;
+				from_each=first_msg;
 			}
 			else if(NM.count)
 				playBeep('error.wav');
@@ -191,7 +198,7 @@
 				$('.chatbox').append("<div id='"+from_each++ +"' style='display:none'><span class=\"user\">"+NM.chat[i].user+'</span><span class="time">'+NM.chat[i].date+'</span><br><pre>'+parse(NM.chat[i].text)+"</pre></div>");
 				else
 				$('.chatbox').append("<div id='"+from_each++ +"' style='display:none'><span class=\"user\">"+NM.chat[i].user+'</span><span class="time">'+NM.chat[i].date+'</span><br><pre>'+NM.chat[i].text+"</pre></div>");
-				console.log($(('#'+(from_each-1))).height());
+				// console.log($(('#'+(from_each-1))).height());
 				if($(('#'+(from_each-1))).height()>150)
 				{
 					$(('#'+(from_each-1))+' > pre').addClass('shortened');
