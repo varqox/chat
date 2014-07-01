@@ -111,7 +111,9 @@
 	}
 	</style>
 	<script type="text/javascript">
-
+	var emots=[
+	[":)","smile.gif"],[":-)","smile.gif"],
+	[":(","sad.gif"],[":-(","sad.gif"]];
 	function fill_to_width(text, size)
 	{
 		text=new String(text);
@@ -305,52 +307,59 @@
 		{
 			if(text[i] == '\\' && i+1<text.length)
 				result += text[++i];
-			else if(strcmp(text, i, ":-)"))
+			else
 			{
-				result+= '<img src="emoticons/smile.gif" alt=":-)" class="emoticon" />';
-				i+=2;
-			}
-			else if(strcmp(text, i, ":)"))
-			{
-				result+= '<img src="emoticons/smile.gif" alt=":)" class="emoticon" />';
-				i+=1;
-			}
-			else if(text[i] == '[')
-			{
-				if(strcmp(text, i+1, "code]"))
+				var czy=0;
+				for(var j=0; j<emots.length&&czy==0; j++)
 				{
-					i += 5;
-					result += '<pre class="code">';
-					while(++i < text.length && !(text[i] == '[' && strcmp(text, i+1, "/code]")))
-						result += safe_char(text[i]);
-					i += 6;
-					result += '</pre>';
+					if(strcmp(text, i, emots[j][0]))
+					{
+						result+='<img src="emoticons/'+emots[j][1]+'" alt=":)" class="emoticon" />';
+						i+=emots[j][0].length-1;
+						czy=1;
+					}
 				}
-				else if(strcmp(text, i+1, "ok]"))
+				if(czy==1)
 				{
-					i+=3;
-					result += '<div style="font-size: 30px;background:#00BF00;width:70px">OK</div>';
+					//do nothing
 				}
-				else if(strcmp(text, i+1, "fuck]"))
+				else if(text[i] == '[')
 				{
-					i+=5;
-					result += '<div style="font-size: 30px;background:red;width:70px">Fuck</div>';
-				}
-				else if(strcmp(text, i+1, "a]"))
-				{
-					i += 2;
-					result += '<a href="';
-					var x = String();
-					while(++i < text.length && !(text[i] == '[' && strcmp(text, i+1, "/a]")))
-						x += safe_char(text[i]);
-					i += 3;
-					result += x + '">'+x+'</a>';
+					if(strcmp(text, i+1, "code]"))
+					{
+						i += 5;
+						result += '<pre class="code">';
+						while(++i < text.length && !(text[i] == '[' && strcmp(text, i+1, "/code]")))
+							result += safe_char(text[i]);
+						i += 6;
+						result += '</pre>';
+					}
+					else if(strcmp(text, i+1, "ok]"))
+					{
+						i+=3;
+						result += '<div style="font-size: 30px;background:#00BF00;width:70px">OK</div>';
+					}
+					else if(strcmp(text, i+1, "fuck]"))
+					{
+						i+=5;
+						result += '<div style="font-size: 30px;background:red;width:70px">Fuck</div>';
+					}
+					else if(strcmp(text, i+1, "a]"))
+					{
+						i += 2;
+						result += '<a href="';
+						var x = String();
+						while(++i < text.length && !(text[i] == '[' && strcmp(text, i+1, "/a]")))
+							x += safe_char(text[i]);
+						i += 3;
+						result += x + '">'+x+'</a>';
+					}
+					else
+						result += '[';
 				}
 				else
-					result += '[';
+					result += safe_char(text[i]);
 			}
-			else
-				result += safe_char(text[i]);
 		}
 		return result;
 	}
