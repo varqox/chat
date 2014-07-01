@@ -90,6 +90,7 @@
 		-webkit-border-radius: 4px;
 		-moz-border-radius: 4px;
 		border-radius: 4px;
+		position: relative;
 	}
 	.code
 	{
@@ -103,7 +104,7 @@
 		-moz-border-radius: 4px;
 		border-radius: 4px;
 	}
-	.extended{
+	.shortened{
 		height: 140px;
 	}
 	.emoticon{
@@ -149,11 +150,11 @@
 	}
 	function show_more(i)
 	{
-		if ($('#'+i+' > pre').hasClass("extended"))
-			{$('#'+i+' > button').html("show less");}
+		if ($('#'+i+' > pre').hasClass("shortened"))
+			{$('#'+i+' > pre > button').html("show less");}
 		else
-			{$('#'+i+' > button').html("show more");}
-		$('#'+i+' > pre').toggleClass("extended");
+			{$('#'+i+' > pre > button').html("show more");}
+		$('#'+i+' > pre').toggleClass("shortened");
 	}
 	var from_each = 0, user, currentScroll, refresh_busy=false;
 	function refresh()
@@ -198,8 +199,8 @@
 				//console.log($(('#'+(from_each-1))).height());
 				if($(('#'+(from_each-1))).height()>150)
 				{
-					$(('#'+(from_each-1))+' > pre').addClass('extended');
-					$(('#'+(from_each-1))).append('<button onclick="show_more('+(from_each-1)+')" style="margin-top: 3px">show more</button>');
+					$(('#'+(from_each-1))+' > pre').addClass('shortened');
+					$(('#'+(from_each-1))+' > pre').append('<button onclick="show_more('+(from_each-1)+')" style="margin-top: 3px;position:absolute;bottom:0px;right:0px">show more</button>');
 				}
 				$(('#'+(from_each-1))).fadeIn(1000);
 			}
@@ -367,7 +368,7 @@
 </head>
 <body onload="startup()"style="font-family:'DejaVu Sans'">
 <p>Last refresh: <span id='h'></span><p>
-<div id='conn_error' style="display:none;width:400px;height:80px;background:rgba(255,0,0,0.8);font-size:55px;border-radius:5px;text-align:center;position:fixed;top: 50%;left: 50%;margin-top: -40px;margin-left: -200px;"><center style="padding-top: 5px;height:80px;">Fuck you</center></div>
+<div id='conn_error' style="display:none;width:400px;height:80px;background:rgba(255,0,0,0.8);font-size:55px;border-radius:5px;text-align:center;position:fixed;z-index:1000;top: 50%;left: 50%;margin-top: -40px;margin-left: -200px;"><center style="padding-top: 5px;height:80px;">Fuck you</center></div>
 <div class="chat">
 <span id="chatbeep"></span>
 <div class="chatbox">
