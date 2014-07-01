@@ -212,7 +212,7 @@
 			}
 			// if scroll was at bottom we move it to bottom back
 			if(scrollToBottom)
-				chatcontent.scrollTop=chatcontent.scrollHeight-chatcontent.clientHeight;
+				chatbox.scrollTop=chatbox.scrollHeight-chatbox.clientHeight;
 			refresh_busy=false;
 			$('#conn_error').css("display", "none");
 		}).error(function ()
