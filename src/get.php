@@ -6,6 +6,7 @@
 // header('Content-type: application/text');
 
 $size_after_cleaning=100;
+$MAX_REQ_MSG=50;
 
 require_once "debug.php";
 
@@ -17,7 +18,7 @@ if(isset($_POST['message']))
 	deb('message received: '.$_POST['message'].' text: '.$msg->text);
 	if ($msg->user=="SYSTEM")
 	{
-		exit;	//TODO - resturn message: show 'Fuck you'
+		exit;	//TODO - return message: show 'Fuck you'
 	}
 	if ($msg->text[0]=='/')//user command catch
 	{
@@ -95,43 +96,59 @@ if(isset($_POST['message']))
 // return $out;
 // }
 
-if(!isset($_GET['from_each']))
+if(!isset($_GET['what']))
 	exit;
 
 // echo "<pre>";
 // print_r($_GET);
 // echo $_GET['time'];
 // $file=file("history.txt");
-
-$data=json_decode(file_get_contents("history.txt"));
-
-// echo "<pre>";
-// print_r($data);
-
-$result=array();
-$result['chat']=array();
-//deb('data size: '.$data->{'size'});
-if(!isset($data->{'chat'}))
+$what=$_GET['what'];
+switch ($what)
 {
-	echo '{"chat":[],"count":0,"clear":1}';
-	deb('sanding empty info');
-	exit;
-}
-for($i=$_GET['from_each']; $i<$data->{'size'}; ++$i)
-	$result['chat'][]=$data->{'chat'}[$i];
-if($_GET['from_each']>$data->{'size'})
-{
-	$result['clear']=1;
-	for($i=0; $i<$data->{'size'}; ++$i)
-	$result['chat'][]=$data->{'chat'}[$i];
-}
+	case 0:	//GET_NEW
+		if(!isset($_GET['from_each']))
+		{
+			echo 'BAD REQUEST';
+			exit;
+		}
+		$data=json_decode(file_get_contents("history.txt"));
+		$result=array();
+		$result['chat']=array();
+		//deb('data size: '.$data->{'size'});
+		if(!isset($data->{'chat'}))
+		{
+			echo '{"chat":[],"count":0,"clear":1}';
+			deb('sanding empty info');
+			exit;
+		}
+		if($data->{'size'}-$_GET['from_each']<=$MAX_REQ_MSG)
+			$result['begining']=$_GET['from_each'];
+		else
+			{
+				$result['begining']=$data->{'size'}-$MAX_REQ_MSG;
+				$result['clear']=1;
+			}
+		for($i=$result['begining']; $i<$data->{'size'}; ++$i)
+			$result['chat'][]=$data->{'chat'}[$i];
+		if($_GET['from_each']>$data->{'size'})
+		{
+			$result['clear']=1;
+			$i=0;
+			if($data->{'size'}-$i>$MAX_REQ_MSG)
+				$i=$data->{'size'}-$MAX_REQ_MSG;
+			$result['begining']=$i;
+			for(; $i<$data->{'size'}; ++$i)
+			$result['chat'][]=$data->{'chat'}[$i];
+		}
 
-// echo "<pre>";
-// print_r($result);
-// echo "</pre>";
+		$result['count']=count($result['chat']);
+		echo json_encode($result);
+	break;
+	case 1: //GET_OLD
 
-$result['count']=count($result['chat']);
-echo json_encode($result);
+	break;
+}
 
 // foreach($file as &$line)
 // {
