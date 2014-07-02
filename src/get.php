@@ -146,7 +146,26 @@ switch ($what)
 		echo json_encode($result);
 	break;
 	case 1: //GET_OLD
-
+		if(!isset($_GET['end'])||!isset($_GET['number'])||$_GET['number']>$MAX_REQ_MSG)
+		{
+			echo 'BAD REQUEST';
+			exit;
+		}
+		$data=json_decode(file_get_contents("history.txt"));
+		if($_GET['end']>$data->{'size'})
+		{
+			echo 'BAD REQUEST';
+			exit;
+		}
+		$result=array();
+		$result['chat']=array();
+		$result['count']=0;
+		for ($i=$_GET['end'];($i>=$_GET['end']-$_GET['number'])&&$i>0;$i--)
+		{
+			$result['chat'][]=$data->{'chat'}[$i];
+			$result['count']++;
+		}
+		echo json_encode($result);
 	break;
 }
 

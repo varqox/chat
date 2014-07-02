@@ -160,18 +160,20 @@
 			{$('#'+i+' > pre > button').html("show more");}
 		$('#'+i+' > pre').toggleClass("shortened");
 	}
-	var from_each = 0, first_msg=0 , user, currentScroll, refresh_busy=false;
-	 REQ_CODE = new Enum("GET_NEW","GET_OLD");
+	var from_each = 0, first_msg=0 , user, currentScroll, busy=false;
+	// REQUEST CODES:
+	// GET_NEW - 0
+	// GET_OLD - 1
 	function refresh()
 	{
 		// var success,
 		// d=Math.floor((new Date()).getTime()/1000);
 		// if(d==old_time) return;
-
-		if(refresh_busy)
+		if(busy)
 			return;
 		else
-			refresh_busy=true;
+			busy=true;
+		var chatbox=document.getElementsByClassName('chatbox')[0];
 		$.get("get.php?what=0&from_each="+from_each).success(function(responseText, textStatus, XMLHttpRequest)
 		{
 			$('#h').text((new Date()).toString());
@@ -180,12 +182,11 @@
 			catch (e) {
 				console.error("Parsing error:", e);
 				$('#conn_error').css("display", "block");
-				refresh_busy=false;
+				busy=false;
 				return;
 			}
-			var chatcontent=document.getElementsByClassName('chatcontent')[0];
 			// $('#h').append(chatcontent.scrollHeight+' '+chatcontent.clientHeight+' '+chatcontent.scrollTop);
-			var scrollToBottom=(chatcontent.scrollHeight-chatcontent.clientHeight==chatcontent.scrollTop);
+			var scrollToBottom=(chatbox.scrollHeight-chatbox.clientHeight==chatbox.scrollTop);
 			// $('#h').append(' -> '+scrollToBottom);
 			if (NM.clear)
 			{
@@ -213,13 +214,51 @@
 			// if scroll was at bottom we move it to bottom back
 			if(scrollToBottom)
 				chatbox.scrollTop=chatbox.scrollHeight-chatbox.clientHeight;
-			refresh_busy=false;
+			busy=false;
 			$('#conn_error').css("display", "none");
 		}).error(function ()
 		{
 			$('#conn_error').css("display", "block");
-			refresh_busy=false;
+			busy=false;
 		});
+		if(chatbox.scrollTop<6)
+		{
+			busy=true;
+			var PopScrollHeight=chatbox.scrollHeight-chatbox.scrollTop;
+			$.get("get.php?what=1&end="+(first_msg-1)+"&number=10").success(function(responseText, textStatus, XMLHttpRequest)
+			{
+				$('#h').text((new Date()).toString());
+				var NM;
+				try {NM=JSON.parse(responseText);}
+				catch (e) {
+					console.error("Parsing error:", e);
+					$('#conn_error').css("display", "block");
+					busy=false;
+					return;
+				}
+				var chatcontent=document.getElementsByClassName('chatcontent')[0];
+				for(i=0; i<NM.count; ++i)
+				{
+					if (NM.chat[i].user!="SYSTEM")
+					$('.chatcontent').prepend("<div id='"+(--first_msg)+"' style='display:none'><span class=\"user\">"+NM.chat[i].user+'</span><span class="time">'+NM.chat[i].date+'</span><br><pre>'+parse(NM.chat[i].text)+"</pre></div>");
+					else
+					$('.chatcontent').prepend("<div id='"+(--first_msg)+"' style='display:none'><span class=\"user\">"+NM.chat[i].user+'</span><span class="time">'+NM.chat[i].date+'</span><br><pre>'+NM.chat[i].text+"</pre></div>");
+					// console.log($(('#'+(from_each-1))).height());
+					if($('#'+first_msg).height()>150)
+					{
+						$(('#'+first_msg)+' > pre').addClass('shortened');
+						$(('#'+first_msg)+' > pre').append('<button onclick="show_more('+first_msg+')" style="margin-top: 3px;position:absolute;bottom:0px;right:0px">show more</button>');
+					}
+					$('#'+first_msg).fadeIn(1000);
+				}
+				chatbox.scrollTop=chatbox.scrollHeight-PopScrollHeight;
+				busy=false;
+			}).error(function ()
+			{
+				$('#conn_error').css("display", "block");
+				busy=false;
+			});
+		}
 	}
 	setInterval(refresh, 200);
 
@@ -361,7 +400,7 @@
 <div class="chat">
 <span id="chatbeep"></span>
 <div class="chatbox">
-...
+<p id="loading_old" style="font-size:15px;font-weight: bold">...</p>
 <div class="chatcontent">
 </div>
 </div>
