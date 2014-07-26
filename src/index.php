@@ -174,7 +174,7 @@
 		else
 			busy=true;
 		var chatbox=document.getElementsByClassName('chatbox')[0];
-		$.get("get.php?what=0&from_each="+from_each).success(function(responseText, textStatus, XMLHttpRequest)
+		$.get("get.php?what=0&user="+user+"&from_each="+from_each).success(function(responseText, textStatus, XMLHttpRequest)
 		{
 			$('#h').text((new Date()).toString());
 			var NM;

@@ -8,7 +8,7 @@ session_start();
 
 $size_after_cleaning=100;
 $MAX_REQ_MSG=50;
-$MAX_ACTIVE_USER_TIME=60;
+$MAX_ACTIVE_USER_TIME=60000;
 $USER_TIME_REFRESH=5;
 
 require_once "debug.php";
@@ -20,8 +20,9 @@ if(isset($_POST['message']))
 {
 	$msg=json_decode($_POST['message']);
 	deb('message received: '.$_POST['message'].' text: '.$msg->text);
-	if ($msg->user=="SYSTEM")
+	if ($msg->user=="SYSTEM")//||$msg->user=="Arkadiusz Piasta"||$msg->user=="Arkadiusz Piąsta")
 	{
+		echo("FUCK YOU!");
 		exit;	//TODO - return message: show 'Fuck you'
 	}
 	if ($msg->text[0]=='/')//user command catch
@@ -108,7 +109,12 @@ if(!isset($_GET['what']))
 // echo $_GET['time'];
 // $file=file("history.txt");
 $what=$_GET['what'];
-$user="tets_user";//$_SESSION['user'];
+if(!isset($_GET['user']))
+{
+	echo 'BAD REQUEST';
+	exit;
+}
+$user=$_GET['user'];
 $sid=session_id();
 $act_u_cont=load_data("data/active_users.txt",false);
 $il=0;
@@ -118,7 +124,7 @@ foreach ($act_u_cont->data as &$val)
 {
 	if($val->{'time'}-time()>$MAX_ACTIVE_USER_TIME)
 		$il++;
-	if($val->{'sid'}==$sid&&$val->{'time'}>$USER_TIME_REFRESH)
+	if($val->{'sid'}==$sid&&time()-$val->{'time'}>$USER_TIME_REFRESH)
 		$refresh=true;
 	if($val->{'sid'}==$sid)
 		$is_in_active_users=true;
@@ -136,6 +142,8 @@ if($refresh)
 		if($val->{'sid'}==$sid)
 		{
 			$val->{'time'}=time();
+			$val->{'name'}=$user;
+			$val->{'ip'}=$_SERVER['REMOTE_ADDR'];
 			$new_data[]=$val;
 		}
 		else if($val->{'time'}-time()<$MAX_ACTIVE_USER_TIME)
@@ -145,6 +153,7 @@ if($refresh)
 	$val['time']=time();
 	$val['sid']=$sid;
 	$val['name']=$user;
+	$val['ip']=$_SERVER['REMOTE_ADDR'];
 	if($is_in_active_users==false)
 		$new_data[]=$val;
 	$u_r_cont->data=$new_data;

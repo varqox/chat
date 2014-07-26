@@ -76,14 +76,15 @@ function unload_data(&$cont)
 		fclose($tmp);
 		file_put_contents($cont->name.".bak", json_encode($data));
 		$to_write=json_encode($new_data);
-		$tmpek=fopen($cont->name,"w");
-		fwrite($tmpek, $to_write);
-		fclose($tmpek);
-		echo($to_write);
+		/*$tmpek=fopen("data/active_users.txt","w");
+		if(!$tmpek) echo("error");
+		echo(fwrite($tmpek, "to jest sobie tekst"));
+		fclose($tmpek);*/
 		file_put_contents($cont->name, $to_write);
+		//echo($to_write);
 	}
 	$lock['locked']=0;
-	$tmp=fopen($cont->name,"w");
+	$tmp=fopen($cont->name.".lock","w");
 	fclose($tmp);
 	file_put_contents($cont->name.".lock", json_encode($lock));
 }
