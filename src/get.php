@@ -1,4 +1,5 @@
 <?php
+session_start();
 // $_POST['00']="xd";
 // if(isset($_GET['time']))
 // 	$_POST['time']=$_GET['time'];
@@ -7,8 +8,11 @@
 
 $size_after_cleaning=100;
 $MAX_REQ_MSG=50;
+$MAX_ACTIVE_USER_TIME=60;
+$USER_TIME_REFRESH=5;
 
 require_once "debug.php";
+require_once "data_base.php";
 
 $max_message_lenght=20*1024;
 
@@ -104,6 +108,48 @@ if(!isset($_GET['what']))
 // echo $_GET['time'];
 // $file=file("history.txt");
 $what=$_GET['what'];
+$user="tets_user";//$_SESSION['user'];
+$sid=session_id();
+$act_u_cont=load_data("data/active_users.txt",false);
+$il=0;
+$refresh=false;
+$is_in_active_users=false;
+foreach ($act_u_cont->data as &$val)
+{
+	if($val->{'time'}-time()>$MAX_ACTIVE_USER_TIME)
+		$il++;
+	if($val->{'sid'}==$sid&&$val->{'time'}>$USER_TIME_REFRESH)
+		$refresh=true;
+	if($val->{'sid'}==$sid)
+		$is_in_active_users=true;
+}
+if($is_in_active_users==false)
+	$refresh=true;
+if($il>0)
+	$refresh=true;
+if($refresh)
+{
+	$u_r_cont=load_data("data/active_users.txt",true);
+	$new_data=array();
+	foreach ($u_r_cont->data as &$val)
+	{
+		if($val->{'sid'}==$sid)
+		{
+			$val->{'time'}=time();
+			$new_data[]=$val;
+		}
+		else if($val->{'time'}-time()<$MAX_ACTIVE_USER_TIME)
+			$new_data[]=$val;
+	}
+	$val=array();
+	$val['time']=time();
+	$val['sid']=$sid;
+	$val['name']=$user;
+	if($is_in_active_users==false)
+		$new_data[]=$val;
+	$u_r_cont->data=$new_data;
+	unload_data($u_r_cont);
+}
 switch ($what)
 {
 	case 0:	//GET_NEW
@@ -166,6 +212,15 @@ switch ($what)
 			$result['count']++;
 		}
 		echo json_encode($result);
+	case 2: //GET_USERS
+		$result=array();
+		foreach ($act_u_cont->data as &$val)
+		{
+    		$result['name'][]=$val['name'];
+    		$result['time'][]=$val['time']-time();
+		}
+		echo json_encode($result);
+		unload_data($act_u_cont);
 	break;
 }
 
