@@ -8,11 +8,110 @@ session_start();
 
 $size_after_cleaning=100;
 $MAX_REQ_MSG=50;
-$MAX_ACTIVE_USER_TIME=60000;
+$MAX_ACTIVE_USER_TIME=3600*36;
 $USER_TIME_REFRESH=5;
 
 require_once "debug.php";
 require_once "data_base.php";
+
+function sys_message($msg_txt)
+{
+	$msg_to_hist=json_decode("{}");
+	$msg_to_hist->user='SYSTEM';
+	$msg_to_hist->date=date("Y-m-d H:i:s");
+	$msg_to_hist->text=$msg_txt;
+	$data_old=json_decode(file_get_contents("history.txt"));
+	$data_new=$data_old;
+	$data_new->{'chat'}[]=$msg_to_hist;
+	$data_new->{'size'}++;
+	$tmp=fopen("history.txt","w");
+	fclose($tmp);
+	file_put_contents("history.txt", json_encode($data_new));
+}
+
+$user="ERROR";
+if(!isset($_GET['user']))
+{
+	if(isset($_POST['message']))
+		$user=json_decode($_POST['message'])->user;
+	else
+	{
+		echo 'BAD REQUEST user';
+		exit;
+	}
+}
+else
+	$user=$_GET['user'];
+if(isset($_COOKIE['klucz']))
+	$sid=$_COOKIE['klucz'];
+else
+	setcookie('klucz',$sid=session_id(),time()+$MAX_ACTIVE_USER_TIME,false,false,false,true);
+$act_u_cont=load_data("data/active_users.txt",false);
+$il=0;
+$refresh=false;
+$first_name;
+$is_in_active_users=false;
+foreach ($act_u_cont->data as &$val)
+{
+	if(time()-$val->{'time'}>$MAX_ACTIVE_USER_TIME)
+		$il++;
+	if($val->{'sid'}==$sid&&time()-$val->{'time'}>$USER_TIME_REFRESH)
+		$refresh=true;
+	if($val->{'sid'}==$sid)
+	{
+		$is_in_active_users=true;
+		$first_name=$val->{'first_name'};
+		if ($val->{'auth'}!=1)
+		{
+			echo('{"wait":1}');
+			exit;
+		}
+	}
+}
+if($is_in_active_users==false)
+	$refresh=true;
+if($il>0)
+	$refresh=true;
+if($refresh)
+{
+	$u_r_cont=load_data("data/active_users.txt",true);
+	$new_data=array();
+	foreach ($u_r_cont->data as &$val)
+	{
+		if($val->{'sid'}==$sid)
+		{
+			$val->{'time'}=time();
+			$val->{'name'}=$user;
+			$val->{'ip'}=$_SERVER['REMOTE_ADDR'];
+			$new_data[]=$val;
+		}
+		else if(time()-($val->{'time'})<$MAX_ACTIVE_USER_TIME)
+			$new_data[]=$val;
+		else
+		{
+			deb("wyrzucanie z bazy danych",$D_Info);
+		}
+	}
+	if($is_in_active_users==false)
+	{
+		$val=json_decode("{}");
+		$val->{'time'}=time();
+		$val->{'sid'}=$sid;
+		$val->{'name'}=$user;
+		$val->{'first_name'}=$user;
+		$val->{'ip'}=$_SERVER['REMOTE_ADDR'];
+		$val->{'auth'}=0;
+		$new_data[]=$val;
+		sys_message("new user connected with username ".$user." to authenticate type:<br />/auth ".sha1($sid));
+		echo('{"wait":1}');
+		$u_r_cont->data=$new_data;
+		unload_data($u_r_cont);
+		exit;
+	}
+	$u_r_cont->data=$new_data;
+	unload_data($u_r_cont);
+}
+
 
 $max_message_lenght=20*1024;
 
@@ -31,8 +130,8 @@ if(isset($_POST['message']))
 		for (;$end_of_first_word<strlen($msg->text)&&$msg->text[$end_of_first_word]!=' ';$end_of_first_word++)
 			;
 		$command=substr($msg->text, 1,$end_of_first_word-1);
-		$parameter=substr($msg->text,$end_of_first_word);
-		deb("command received: ".$msg->text." command: ",$D_Debug);//.$command.strlen($msg->text)
+		$parameter=substr($msg->text,$end_of_first_word+1);
+		deb("command received: ".$msg->text." command:".$command.".",$D_Debug);//.$command.strlen($msg->text)
 		if($command=='clean')
 		{
 			//deb("Thinking about cleaning",$D_Info);
@@ -64,6 +163,42 @@ if(isset($_POST['message']))
 				fclose($tmp);
 				file_put_contents("history.txt", json_encode($data_new));
 			}
+		}
+		else if($command=='auth')
+		{
+			$u_r_cont=load_data("data/active_users.txt",true);
+			$new_data=array();
+			$found=0;
+			$found_name;
+			$found_ip;
+			$found_sid;
+			$par_trimmed=trim($parameter);
+			foreach ($u_r_cont->data as &$val)
+			{
+				if(substr(sha1($val->{'sid'}),0,strlen($par_trimmed))==$par_trimmed)
+				{
+					$val->{'auth'}=1;
+					$new_data[]=$val;
+					$found++;
+					$found_name=$val->{'name'};
+					$found_ip=$val->{'ip'};
+					$found_sid=$val->{'sid'};
+				}
+				else if($val->{'time'}-time()<$MAX_ACTIVE_USER_TIME)
+					$new_data[]=$val;
+			}
+			deb("Thinking about authenticating $found",$D_Info);
+			if($found==0)
+				sys_message("$user - insued auth command, but $user used wrong code.");
+			else if($found>2)
+				sys_message("$user - insued auth command, but there were found $found users with this code prefix.");
+			else
+			{
+				deb("authenticating $found_name - $found_ip - $found_sid , by $user - $first_name - ".$_SERVER['REMOTE_ADDR']." - $sid",$D_Info);
+				sys_message("$user - insued auth command, $found_name is authenticated.");
+				$u_r_cont->data=$new_data;
+			}
+			unload_data($u_r_cont);
 		}
 		exit;
 	}
@@ -109,62 +244,13 @@ if(!isset($_GET['what']))
 // echo $_GET['time'];
 // $file=file("history.txt");
 $what=$_GET['what'];
-if(!isset($_GET['user']))
-{
-	echo 'BAD REQUEST';
-	exit;
-}
-$user=$_GET['user'];
-$sid=session_id();
-$act_u_cont=load_data("data/active_users.txt",false);
-$il=0;
-$refresh=false;
-$is_in_active_users=false;
-foreach ($act_u_cont->data as &$val)
-{
-	if($val->{'time'}-time()>$MAX_ACTIVE_USER_TIME)
-		$il++;
-	if($val->{'sid'}==$sid&&time()-$val->{'time'}>$USER_TIME_REFRESH)
-		$refresh=true;
-	if($val->{'sid'}==$sid)
-		$is_in_active_users=true;
-}
-if($is_in_active_users==false)
-	$refresh=true;
-if($il>0)
-	$refresh=true;
-if($refresh)
-{
-	$u_r_cont=load_data("data/active_users.txt",true);
-	$new_data=array();
-	foreach ($u_r_cont->data as &$val)
-	{
-		if($val->{'sid'}==$sid)
-		{
-			$val->{'time'}=time();
-			$val->{'name'}=$user;
-			$val->{'ip'}=$_SERVER['REMOTE_ADDR'];
-			$new_data[]=$val;
-		}
-		else if($val->{'time'}-time()<$MAX_ACTIVE_USER_TIME)
-			$new_data[]=$val;
-	}
-	$val=array();
-	$val['time']=time();
-	$val['sid']=$sid;
-	$val['name']=$user;
-	$val['ip']=$_SERVER['REMOTE_ADDR'];
-	if($is_in_active_users==false)
-		$new_data[]=$val;
-	$u_r_cont->data=$new_data;
-	unload_data($u_r_cont);
-}
+
 switch ($what)
 {
 	case 0:	//GET_NEW
 		if(!isset($_GET['from_each']))
 		{
-			echo 'BAD REQUEST';
+			echo 'BAD REQUEST from_each';
 			exit;
 		}
 		$data=json_decode(file_get_contents("history.txt"));
@@ -203,13 +289,13 @@ switch ($what)
 	case 1: //GET_OLD
 		if(!isset($_GET['end'])||!isset($_GET['number'])||$_GET['number']>$MAX_REQ_MSG)
 		{
-			echo 'BAD REQUEST';
+			echo 'BAD REQUEST end or number';
 			exit;
 		}
 		$data=json_decode(file_get_contents("history.txt"));
 		if($_GET['end']>$data->{'size'})
 		{
-			echo 'BAD REQUEST';
+			echo 'BAD REQUEST size';
 			exit;
 		}
 		$result=array();
@@ -221,12 +307,13 @@ switch ($what)
 			$result['count']++;
 		}
 		echo json_encode($result);
+	break;
 	case 2: //GET_USERS
 		$result=array();
 		foreach ($act_u_cont->data as &$val)
 		{
-    		$result['name'][]=$val['name'];
-    		$result['time'][]=$val['time']-time();
+    		$result['name'][]=$val->{'name'};
+    		$result['time'][]=$val->{'time'}-time();
 		}
 		echo json_encode($result);
 		unload_data($act_u_cont);

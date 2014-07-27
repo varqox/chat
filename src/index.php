@@ -182,6 +182,7 @@
 			catch (e) {
 				console.error("Parsing error:", e);
 				$('#conn_error').css("display", "block");
+				$('#wait').css("display", "none");
 				busy=false;
 				return;
 			}
@@ -194,6 +195,12 @@
 				playBeep('clean.wav');
 				first_msg=NM.begining;
 				from_each=first_msg;
+			}
+			if(NM.wait)
+			{
+				$('#wait').css("display", "block");
+				busy=false;
+				return;
 			}
 			else if(NM.count)
 				playBeep('error.wav');
@@ -216,16 +223,18 @@
 				chatbox.scrollTop=chatbox.scrollHeight-chatbox.clientHeight;
 			busy=false;
 			$('#conn_error').css("display", "none");
+			$('#wait').css("display", "none");
 		}).error(function ()
 		{
 			$('#conn_error').css("display", "block");
+			$('#wait').css("display", "none");
 			busy=false;
 		});
 		if(chatbox.scrollTop<6)
 		{
 			busy=true;
 			var PopScrollHeight=chatbox.scrollHeight-chatbox.scrollTop;
-			$.get("get.php?what=1&end="+(first_msg-1)+"&number=10").success(function(responseText, textStatus, XMLHttpRequest)
+			$.get("get.php?what=1&user="+user+"&end="+(first_msg-1)+"&number=10").success(function(responseText, textStatus, XMLHttpRequest)
 			{
 				$('#h').text((new Date()).toString());
 				var NM;
@@ -233,6 +242,12 @@
 				catch (e) {
 					console.error("Parsing error:", e);
 					$('#conn_error').css("display", "block");
+					busy=false;
+					return;
+				}
+				if(NM.wait)
+				{
+					$('#wait').css("display", "block");
 					busy=false;
 					return;
 				}
@@ -252,10 +267,12 @@
 					$('#'+first_msg).fadeIn(1000);
 				}
 				chatbox.scrollTop=chatbox.scrollHeight-PopScrollHeight;
+				$('#wait').css("display", "none");
 				busy=false;
 			}).error(function ()
 			{
 				$('#conn_error').css("display", "block");
+				$('#wait').css("display", "none");
 				busy=false;
 			});
 		}
@@ -397,6 +414,7 @@
 <body onload="startup()"style="font-family:'DejaVu Sans'">
 <p>Last refresh: <span id='h'></span><p>
 <div id='conn_error' style="display:none;width:400px;height:80px;background:rgba(255,0,0,0.8);font-size:55px;border-radius:5px;text-align:center;position:fixed;z-index:1000;top: 50%;left: 50%;margin-top: -40px;margin-left: -200px;"><center style="padding-top: 5px;height:80px;">Fuck you</center></div>
+<div id='wait' style="width:400px;height:80px;background:rgba(10,10,255,0.8);font-size:55px;border-radius:5px;text-align:center;color:rgba(255,255,255,1);position:fixed;z-index:1000;top: 50%;left: 50%;margin-top: -40px;margin-left: -200px;"><center style="padding-top: 5px;height:80px;">Wait...</center></div>
 <div class="chat">
 <span id="chatbeep"></span>
 <div class="chatbox">

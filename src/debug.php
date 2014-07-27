@@ -13,6 +13,8 @@ function deb($co,$lvl=5)
 	if($debuglvl>=$lvl)
 	{
 		$handle=fopen("debug.txt","a");
+		fwrite($handle, date("Y-m-d H:i:s"));
+		fwrite($handle, " - ");
 		fwrite($handle, $lvl);
 		fwrite($handle, " - ");
 		fwrite($handle, $co);
