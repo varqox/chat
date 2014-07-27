@@ -10,7 +10,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>Chat test</title>
+	<title>chat</title>
 	<script type="text/javascript" src="jquery.js"></script>
 	<style>
 	div:after{
@@ -160,7 +160,45 @@
 			{$('#'+i+' > pre > button').html("show more");}
 		$('#'+i+' > pre').toggleClass("shortened");
 	}
-	var from_each = 0, first_msg=0 , user, currentScroll, busy=false;
+	var from_each = 0, first_msg=0 , user, currentScroll, busy=false,title_pulsing=false,pulse_state=false, mouse_x,mouse_y,pulse_int=0;
+    function handleMouseMove(event) {
+        event = event || window.event; // IE-ism
+        var changed=false;
+        if(event.clientX!=mouse_x)
+    	{
+    		mouse_x=event.clientX;
+    		changed=true;
+    	}
+        if(event.clientY!=mouse_y)
+        {
+        	mouse_y=event.clientY;
+        	changed=true;
+        }
+        if(changed)
+        {
+        	if(title_pulsing)
+        	{
+        		clearInterval(pulse_int);
+        		title_pulsing=false;
+        		document.title=document.title.toLowerCase();
+				pulse_state=false;
+        	}
+        }
+    }
+    window.onmousemove = handleMouseMove;
+	function pulse_title()
+	{
+		if(pulse_state)
+		{
+			document.title=document.title.toLowerCase();
+			pulse_state=false;
+		}
+		else
+		{
+			document.title=document.title.toUpperCase();
+			pulse_state=true;
+		}
+	}
 	// REQUEST CODES:
 	// GET_NEW - 0
 	// GET_OLD - 1
@@ -210,6 +248,11 @@
 					$(('#'+(from_each-1))+' > pre').append('<button onclick="show_more('+(from_each-1)+')" style="margin-top: 3px;position:absolute;bottom:0px;right:0px">show more</button>');
 				}
 				$(('#'+(from_each-1))).fadeIn(1000);
+			}
+			if(NM.count>0&&title_pulsing==false)
+			{
+				title_pulsing=true;
+				pulse_int=setInterval(pulse_title,1000);
 			}
 			// if scroll was at bottom we move it to bottom back
 			if(scrollToBottom)
